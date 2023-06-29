@@ -1,16 +1,19 @@
+import Phonebook from './Phonebook/Phonebook';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { Register } from './User/Register';
+import { Login } from './User/Login';
+import { Toaster } from 'react-hot-toast';
+
 export const App = () => {
   return (
-    <div
-      style={{
-        height: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontSize: 40,
-        color: '#010101'
-      }}
-    >
-      React homework template
-    </div>
+    <>
+      <Toaster />
+      <Routes>
+        <Route path="/" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/contacts" element={<Phonebook />} />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </>
   );
 };
