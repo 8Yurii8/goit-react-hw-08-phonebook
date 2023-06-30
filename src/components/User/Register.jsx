@@ -7,7 +7,7 @@ import { createUser } from '../../store/user/auth';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 
-export const Register = () => {
+const Register = () => {
   const dispatch = useDispatch();
   const isLoading = useSelector(state => state.user.isLoading);
   const error = useSelector(state => state.user.error);
@@ -44,15 +44,6 @@ export const Register = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', flexDirection: 'row-reverse' }}>
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={() => navigate('/login')}
-        >
-          login
-        </Button>
-      </div>
       <h2>Registration</h2>
       {error && <div>Error: {error.message}</div>}
       <Formik
@@ -123,3 +114,4 @@ export const Register = () => {
     </div>
   );
 };
+export default Register;

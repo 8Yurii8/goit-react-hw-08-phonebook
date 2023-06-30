@@ -1,5 +1,5 @@
 // import { createSlice } from '@reduxjs/toolkit';
-// import { createUser, loginUser } from './auth';
+// import { createUser, loginUser, logoutUser, refreshUser } from './auth';
 
 // const userSlice = createSlice({
 //   name: 'user',
@@ -7,8 +7,14 @@
 //     currentUser: null,
 //     isLoading: false,
 //     error: null,
+//     isAuthenticated: false,
 //   },
-//   reducers: {},
+//   reducers: {
+//     setCurrentUser(state, action) {
+//       state.currentUser = action.payload;
+//       state.token = action.payload.token;
+//     },
+//   },
 //   extraReducers: builder => {
 //     builder
 //       .addCase(createUser.pending, state => {
@@ -18,6 +24,7 @@
 //       .addCase(createUser.fulfilled, (state, action) => {
 //         state.isLoading = false;
 //         state.currentUser = action.payload;
+//         state.token = action.payload.token;
 //       })
 //       .addCase(createUser.rejected, (state, action) => {
 //         state.isLoading = false;
@@ -30,19 +37,47 @@
 //       .addCase(loginUser.fulfilled, (state, action) => {
 //         state.isLoading = false;
 //         state.currentUser = action.payload;
+//         state.token = action.payload.token;
+//         state.isAuthenticated = true;
 //       })
 //       .addCase(loginUser.rejected, (state, action) => {
+//         state.isLoading = false;
+//         state.error = action.payload;
+//       })
+//       .addCase(logoutUser.pending, state => {
+//         state.isLoading = true;
+//         state.error = null;
+//       })
+//       .addCase(logoutUser.fulfilled, state => {
+//         state.isLoading = false;
+//         state.currentUser = null;
+//         state.token = null;
+//         state.isAuthenticated = false;
+//       })
+//       .addCase(logoutUser.rejected, (state, action) => {
+//         state.isLoading = false;
+//         state.error = action.payload;
+//       })
+//       .addCase(refreshUser.pending, state => {
+//         state.isLoading = true;
+//         state.error = null;
+//       })
+//       .addCase(refreshUser.fulfilled, (state, action) => {
+//         state.isLoading = false;
+//         state.token = action.payload.token;
+//       })
+//       .addCase(refreshUser.rejected, (state, action) => {
 //         state.isLoading = false;
 //         state.error = action.payload;
 //       });
 //   },
 // });
 
+// export const { setCurrentUser } = userSlice.actions;
 // export const userReducer = userSlice.reducer;
-// export default userSlice.actions;
 
 import { createSlice } from '@reduxjs/toolkit';
-import { createUser, loginUser } from './auth';
+import { createUser, loginUser, logoutUser, refreshUser } from './auth';
 
 const userSlice = createSlice({
   name: 'user',
@@ -50,13 +85,13 @@ const userSlice = createSlice({
     currentUser: null,
     isLoading: false,
     error: null,
+    isAuthenticated: localStorage.getItem('token') !== null,
+    token: localStorage.getItem('token'),
   },
   reducers: {
-    logoutUser: state => {
-      state.currentUser = null;
-      state.isLoading = false;
-      state.error = null;
-      localStorage.removeItem('token'); // Очищення токену
+    setCurrentUser(state, action) {
+      state.currentUser = action.payload;
+      state.token = action.payload.token;
     },
   },
   extraReducers: builder => {
@@ -68,6 +103,7 @@ const userSlice = createSlice({
       .addCase(createUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.currentUser = action.payload;
+        state.token = action.payload.token;
       })
       .addCase(createUser.rejected, (state, action) => {
         state.isLoading = false;
@@ -80,14 +116,43 @@ const userSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.currentUser = action.payload;
+        state.token = action.payload.token;
+        localStorage.setItem('token', action.payload.token);
+        state.isAuthenticated = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(logoutUser.pending, state => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(logoutUser.fulfilled, state => {
+        state.isLoading = false;
+        state.currentUser = null;
+        state.token = null;
+        localStorage.removeItem('token');
+        state.isAuthenticated = false;
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(refreshUser.pending, state => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(refreshUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.currentUser = action.payload;
+      })
+      .addCase(refreshUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });
   },
 });
 
-export const { logoutUser } = userSlice.actions;
+export const { setCurrentUser } = userSlice.actions;
 export const userReducer = userSlice.reducer;
-export default userSlice.actions;

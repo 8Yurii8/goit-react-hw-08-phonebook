@@ -1,19 +1,51 @@
-import Phonebook from './Phonebook/Phonebook';
+import React, { lazy, Suspense } from 'react';
+
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Register } from './User/Register';
-import { Login } from './User/Login';
 import { Toaster } from 'react-hot-toast';
+import Navigation from './Navigations';
+
+import { PrivateRoute, PublicRoute } from 'store/privatePublic';
+
+const Home = lazy(() => import('./Home'));
+const Register = lazy(() => import('./User/Register'));
+const Login = lazy(() => import('./User/Login'));
+const Phonebook = lazy(() => import('./Phonebook/Phonebook'));
 
 export const App = () => {
   return (
     <>
       <Toaster />
-      <Routes>
-        <Route path="/" element={<Register />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/contacts" element={<Phonebook />} />
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
+      <Navigation />
+      <Suspense fallback={<div>Loading...</div>}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route
+            path="/register"
+            element={
+              <PublicRoute>
+                <Register />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/contacts"
+            element={
+              <PrivateRoute>
+                <Phonebook />
+              </PrivateRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </Suspense>
     </>
   );
 };
