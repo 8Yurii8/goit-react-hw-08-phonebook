@@ -8,7 +8,6 @@ import { useEffect } from 'react';
 export const PrivateRoute = ({ children }) => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const dispatch = useDispatch();
-
   useEffect(() => {
     dispatch(refreshUser());
   }, [dispatch]);
@@ -18,11 +17,6 @@ export const PrivateRoute = ({ children }) => {
 
 export const PublicRoute = ({ children }) => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(refreshUser());
-  }, []);
 
   return !isAuthenticated ? children : <Navigate to="/" />;
 };
