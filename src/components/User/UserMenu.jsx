@@ -5,7 +5,14 @@ import Skeleton from '@mui/material/Skeleton';
 export const UserMenu = () => {
   const currentUser = useSelector(state => state.user.currentUser);
 
-  console.log(currentUser);
+  let email = '';
+  if (currentUser) {
+    if (currentUser.email) {
+      email = currentUser.email;
+    } else if (currentUser.user && currentUser.user.email) {
+      email = currentUser.user.email;
+    }
+  }
 
   return (
     <div>
@@ -20,7 +27,7 @@ export const UserMenu = () => {
           marginTop: '10px',
         }}
       >
-        {currentUser ? currentUser.email : ''}
+        {email}
       </Skeleton>
     </div>
   );

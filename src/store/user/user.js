@@ -7,13 +7,13 @@ const userSlice = createSlice({
     currentUser: null,
     isLoading: false,
     error: null,
-    isAuthenticated: localStorage.getItem('token') !== null,
-    token: localStorage.getItem('token'),
+    isAuthenticated: false,
+    token: null,
+    isRefreshing: true,
   },
   reducers: {
     setCurrentUser(state, action) {
       state.currentUser = action.payload;
-      state.token = action.payload.token;
     },
   },
   extraReducers: builder => {
@@ -25,7 +25,6 @@ const userSlice = createSlice({
       .addCase(createUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.currentUser = action.payload;
-        state.token = action.payload.token;
       })
       .addCase(createUser.rejected, (state, action) => {
         state.isLoading = false;
@@ -39,7 +38,6 @@ const userSlice = createSlice({
         state.isLoading = false;
         state.currentUser = action.payload;
         state.token = action.payload.token;
-        localStorage.setItem('token', action.payload.token);
         state.isAuthenticated = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -54,7 +52,6 @@ const userSlice = createSlice({
         state.isLoading = false;
         state.currentUser = null;
         state.token = null;
-        localStorage.removeItem('token');
         state.isAuthenticated = false;
       })
       .addCase(logoutUser.rejected, (state, action) => {
@@ -64,14 +61,17 @@ const userSlice = createSlice({
       .addCase(refreshUser.pending, state => {
         state.isLoading = true;
         state.error = null;
+        state.isRefreshing = true;
       })
       .addCase(refreshUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.currentUser = action.payload;
+        state.isAuthenticated = true;
+        state.isRefreshing = false;
       })
-      .addCase(refreshUser.rejected, (state, action) => {
+      .addCase(refreshUser.rejected, state => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.isRefreshing = false;
       });
   },
 });

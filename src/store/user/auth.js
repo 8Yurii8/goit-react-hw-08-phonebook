@@ -26,6 +26,7 @@ export const loginUser = createAsyncThunk(
         `${API_ENDPOINT}/users/login`,
         userData
       );
+      localStorage.setItem('token', response.data.token);
 
       return response.data;
     } catch (error) {
@@ -37,7 +38,14 @@ export const loginUser = createAsyncThunk(
 export const logoutUser = createAsyncThunk(
   'auth/logoutUser',
   async (_, { rejectWithValue }) => {
+    const token = localStorage.getItem('token');
     try {
+      await axios.post(`${API_ENDPOINT}/users/logout`, null, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      localStorage.removeItem('token');
     } catch (error) {
       return rejectWithValue(error.response.data.user);
     }
@@ -46,9 +54,12 @@ export const logoutUser = createAsyncThunk(
 
 export const refreshUser = createAsyncThunk(
   'auth/refreshUser',
-  async (_, { rejectWithValue, getState }) => {
+  async (_, { rejectWithValue }) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      return rejectWithValue(null);
+    }
     try {
-      const token = localStorage.getItem('token');
       const response = await axios.get(`${API_ENDPOINT}/users/current`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -56,7 +67,7 @@ export const refreshUser = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(null);
     }
   }
 );
